@@ -1,3 +1,18 @@
+//! Features:
+//! - `std`: enabled by default. Enables std support. When it is disabled, the crate is `no_std`.
+//! It will still need `alloc` though.
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+
+#[cfg(not(feature = "std"))]
+use alloc::{
+  borrow::ToOwned,
+  format,
+  string::{String, ToString},
+};
+
 use highlight_error::{*};
 
 #[macro_export]
@@ -171,7 +186,7 @@ pub trait Parser<'i> {
           let codepoint_str = self.take_while(|c| c.is_digit(16));
           self.consume("}")?;
           u32::from_str_radix(codepoint_str, 16)
-            .ok().and_then(std::char::from_u32)
+            .ok().and_then(core::char::from_u32)
             .ok_or_else(|| self.expected::<char>("unicode-codepoint").unwrap_err())
         }
         Some('n') => Ok('\n'),
